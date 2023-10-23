@@ -1,0 +1,28 @@
+TRASH!
+
+https://github.com/Diiego1500/frikyland/tree/main/src/Controller
+
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function add(Post $entity, bool $flush = false): void
+    {
+        $this->_em->persist($entity);
+        if ($flush){
+            $this->_em->flush();
+        }
+    }
+
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function remove(Post $entity, bool $flush = false): void
+    {
+        $this->_em->remove($entity);
+        if ($flush){
+            $this->_em->flush();
+        }
+    }

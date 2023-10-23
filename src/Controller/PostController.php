@@ -2,23 +2,43 @@
 
 namespace App\Controller;
 
-use App\Entity\Post; 
+use App\Entity\Post;
+use App\Entity\User;
+use App\Entity\Interaction;
+use App\Form\PostType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfobny\Component\HttpFoundation\JsonResponse; 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PostController extends AbstractController
 {
-    #[Route('/post/{id}', name: 'app_post')]
-    public function index(Post $post): Response
+    private $em;
+    /**
+     * @param $em
+     */
+    public function __construct(EntityManagerInterface $em)
     {
-        dump($post); 
+        $this->en = $em;
+    }
+
+    #[Route('/', name: 'app_post')]
+    public function index(Request $request): Response
+    {
+        $post = new Post();
+        $form = $this->createForm(PostType::class, $post);
+        $form->handleRequest($request);
+        if ( $form->isSubmitted() && $form->isValid()){
+            $user= $this->em->getRepository(User::class)->find(1);
+            $post->setUser($user);
+            $this->em->persist($post);
+            $this->em->flush();
+            return $this->redirectToRoute('app_post');
+        }
         return $this->render('post/index.html.twig', [
-            'controller_name' => [
-                'nombre' => 'Grecia', 
-                'apellido' => 'Martinez',
-            ],
-            'post' => $post 
-        ]); 
+            'form' => $form->createView()
+        ]);
     }
 }
